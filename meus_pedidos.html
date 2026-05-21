@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smash — Meus Pedidos</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DS TOKENS
+═══════════════════════════════════════════════════════════ */
+:root {
+  --purple-300:#290E43; --purple-100:#46217A;
+  --blue-100:#00AEEF;   --blue-300:#0091FF;
+  --green-300:#008F4A;  --yellow-400:#F6A000;
+  --red-300:#DB0007;    --red-error:#A30D11;
+  --gray-100:#F2F4F7;   --gray-300:#D0D5DD;
+  --gray-500:#8B8D98;   --gray-600:#A9A9A9;
+  --neutral-100:#FCFCFD;--neutral-300:#1C2024;
+  --font:'Roboto',sans-serif;
+  --sh1:0 0 2px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.14);
+  --sh2:0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--gray-100);color:var(--neutral-300);height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;overflow:hidden;}
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════ */
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR — DS node 20115:261510
+═══════════════════════════════════════════════════════════ */
+.sidebar{width:288px;min-width:288px;background:var(--neutral-100);display:flex;flex-direction:column;padding:32px 20px;height:100vh;gap:26px;border-right:1px solid var(--gray-100);}
+.sb-header{display:flex;align-items:flex-start;justify-content:space-between;width:248px;}
+.sb-logo{font-size:30px;font-weight:800;color:var(--purple-300);letter-spacing:-1.5px;line-height:1;}
+.sb-logo-dot{color:#E91E8C;}
+.sb-toggle-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:12px;position:relative;}
+.sb-toggle{width:32px;height:32px;border-radius:8px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-500);}
+.sb-toggle:hover{background:var(--gray-100);}
+.sb-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;}
+.sb-tooltip{background:var(--neutral-100);color:var(--neutral-300);font-size:11px;font-weight:500;padding:4px 10px;border-radius:4px;border:1px solid var(--gray-100);box-shadow:0 2px 8px rgba(0,0,0,.10);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;position:absolute;top:36px;right:0;z-index:10;}
+.sb-toggle-wrap:hover .sb-tooltip{opacity:1;}
+.sb-nav{display:flex;flex-direction:column;gap:8px;width:248px;flex:1;}
+.sb-item{display:flex;align-items:center;gap:12px;padding:8px 16px;border-radius:16px;font-size:14px;font-weight:700;color:var(--neutral-300);cursor:pointer;transition:background .15s;width:248px;user-select:none;}
+.sb-item:hover{background:rgba(208,213,221,.4);}
+.sb-item.active{background:var(--gray-300);}
+.sb-item svg{width:20px;height:20px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.sb-item .sb-lbl{flex:1;font-weight:700;}
+.sb-badge{background:#E53E3E;color:white;font-size:14px;font-weight:700;min-width:22px;height:22px;border-radius:99px;padding:0 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-chev{display:flex;align-items:center;color:var(--gray-500);}
+.sb-chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.sb-footer{width:248px;margin-top:auto;}
+.sb-user{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;background:var(--gray-100);cursor:pointer;transition:background .15s;width:248px;}
+.sb-user:hover{background:var(--gray-300);}
+.sb-avatar{width:40px;height:40px;border-radius:99px;background:var(--purple-300);color:white;font-size:20px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;}
+.sb-avatar .sdot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--green-300);border:2px solid var(--gray-100);}
+.sb-user-info{flex:1;min-width:0;}
+.sb-user-name{font-size:16px;font-weight:400;color:var(--neutral-300);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-email{font-size:12px;font-weight:400;color:var(--gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.sb-user-chev{color:var(--gray-500);display:flex;align-items:center;flex-shrink:0;}
+.sb-user-chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN / TOPBAR / CONTENT
+═══════════════════════════════════════════════════════════ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{height:72px;background:var(--neutral-100);border-bottom:1px solid var(--gray-300);display:flex;align-items:center;justify-content:flex-end;padding:0 32px;flex-shrink:0;box-shadow:var(--sh1);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.tb-icon{width:38px;height:38px;border-radius:99px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.tb-icon:hover{background:var(--gray-100);}
+.tb-icon svg{width:22px;height:22px;stroke:var(--neutral-300);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tb-avatar{width:38px;height:38px;border-radius:99px;background:var(--purple-300);color:white;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.tb-avatar .sdot{position:absolute;bottom:2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--green-300);border:2px solid var(--neutral-100);}
+.content{flex:1;overflow-y:auto;background:var(--gray-100);padding:24px 32px;}
+
+/* Breadcrumb */
+.bc-row{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;margin-bottom:20px;}
+.bc-lk{color:var(--blue-100);cursor:pointer;} .bc-lk:hover{text-decoration:underline;}
+.bc-sep{color:var(--blue-100);font-weight:400;} .bc-cur{color:var(--neutral-300);}
+
+/* Filter chips */
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.fchip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;background:var(--purple-300);color:white;font-size:12px;font-weight:500;}
+.fchip-x{cursor:pointer;opacity:.7;font-size:14px;line-height:1;}
+.fchip-x:hover{opacity:1;}
+
+/* Controls */
+.controls-row{display:flex;align-items:center;gap:6px;margin-bottom:20px;}
+.tab-pill{padding:6px 16px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:all .15s;}
+.tab-pill.active{background:var(--purple-300);color:white;}
+.tab-pill:not(.active){background:transparent;color:var(--purple-300);}
+.tab-pill:not(.active):hover{background:rgba(41,14,67,.08);}
+.filter-btn{margin-left:auto;display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:99px;font-size:12px;font-weight:500;background:var(--neutral-100);color:var(--purple-300);border:1.5px solid rgba(0,0,0,.18);cursor:pointer;font-family:var(--font);transition:all .15s;}
+.filter-btn:hover{background:var(--gray-100);border-color:var(--purple-300);}
+.filter-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* Month heading */
+.month-heading{font-size:32px;font-weight:700;color:var(--neutral-300);letter-spacing:-.5px;margin-bottom:16px;}
+
+/* ═══════════════════════════════════════════════════════════
+   ORDER CARD
+═══════════════════════════════════════════════════════════ */
+.order-card{background:var(--neutral-100);border-radius:16px;box-shadow:var(--sh2);overflow:hidden;margin-bottom:16px;}
+.order-date-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--gray-100);}
+.order-date{font-size:16px;font-weight:500;color:var(--neutral-300);}
+.collapse-btn{width:30px;height:30px;border-radius:99px;background:var(--gray-100);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.collapse-btn:hover{background:var(--gray-300);}
+.collapse-btn svg{width:14px;height:14px;stroke:var(--gray-500);fill:none;stroke-width:2.5;stroke-linecap:round;transition:transform .2s;}
+.order-card.collapsed .collapse-btn svg{transform:rotate(-180deg);}
+.order-summary{display:flex;align-items:center;gap:20px;padding:14px 20px;border-bottom:1px solid var(--gray-100);}
+.av-stack{display:flex;align-items:center;flex-shrink:0;}
+.av-stack .av{width:36px;height:36px;border-radius:99px;border:2.5px solid var(--neutral-100);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;overflow:hidden;flex-shrink:0;}
+.av-stack .av+.av{margin-left:-10px;}
+.av-mc{background:#DA291C;overflow:hidden;}
+.av-ca{background:#111;color:white;font-size:10px;font-weight:800;letter-spacing:-.5px;}
+.av-plus{background:#444;color:var(--neutral-100);font-size:12px;font-weight:500;}
+.order-info{flex:1;min-width:0;}
+.order-value{font-size:14px;font-weight:700;color:var(--neutral-300);}
+.order-fee{font-size:12px;font-weight:600;color:var(--gray-500);margin-top:2px;}
+.order-id{font-size:14px;font-weight:400;color:var(--neutral-300);font-family:monospace;letter-spacing:.3px;white-space:nowrap;}
+.status-badge{padding:4px 12px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0;}
+.s-concluido{background:var(--green-300);color:white;}
+.s-andamento{background:var(--yellow-400);color:white;}
+.order-actions{display:flex;align-items:center;justify-content:flex-end;gap:2px;padding:8px 20px;border-bottom:1px solid var(--gray-100);}
+.action-lk{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:400;color:var(--neutral-300);cursor:pointer;transition:background .15s;white-space:nowrap;}
+.action-lk:hover{background:var(--gray-100);}
+.action-lk svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0;}
+.order-items{padding:0 20px 4px;}
+.items-hdr{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:16px;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:14px;font-weight:500;color:var(--gray-500);}
+.item-row{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--gray-100);align-items:start;}
+.item-row:last-child{border-bottom:none;}
+.item-brand{display:flex;align-items:flex-start;gap:12px;}
+.brand-logo{width:40px;height:40px;border-radius:99px;border:1.5px solid var(--gray-300);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:#DA291C;}
+.brand-info strong{display:block;font-size:16px;font-weight:500;color:var(--neutral-300);}
+.brand-info span{display:block;font-size:12px;font-weight:400;color:var(--neutral-300);margin-top:1px;line-height:1.5;}
+.item-qty{font-size:14px;color:var(--neutral-300);font-weight:700;}
+.item-date{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--neutral-300);font-weight:700;}
+.item-date svg{width:16px;height:16px;stroke:var(--gray-500);fill:none;stroke-width:1.8;flex-shrink:0;}
+.item-acts{display:flex;flex-direction:column;gap:4px;align-items:stretch;width:140px;margin-left:auto;}
+.btn-enviar{padding:6px 0;border-radius:99px;background:var(--purple-300);color:var(--neutral-100);font-size:12px;font-weight:400;border:none;cursor:pointer;font-family:var(--font);width:100%;text-align:center;transition:background .15s;}
+.btn-enviar:hover{background:var(--purple-100);}
+.btn-editar{padding:6px 0;border-radius:99px;background:transparent;color:var(--neutral-300);font-size:12px;font-weight:400;border:1.5px solid var(--neutral-300);cursor:pointer;font-family:var(--font);width:100%;text-align:center;transition:all .15s;}
+.btn-editar:hover{background:rgba(28,32,36,.06);}
+.campaign-lk{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:400;color:#0091FF;cursor:pointer;text-decoration:none;width:100%;}
+.campaign-lk:hover{text-decoration:underline;}
+.campaign-lk svg{width:13px;height:13px;flex-shrink:0;}
+.order-card.collapsed .order-summary,.order-card.collapsed .order-actions,.order-card.collapsed .order-items{display:none;}
+.order-card.collapsed .order-date-row{border-bottom:none;}
+
+/* ═══════════════════════════════════════════════════════════
+   FILTER SHEET  (400px, desliza da direita)
+═══════════════════════════════════════════════════════════ */
+.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;opacity:0;transition:opacity .3s;}
+.sheet-overlay.open{display:block;}
+.sheet-overlay.vis{opacity:1;}
+.filter-sheet{position:fixed;top:0;right:-400px;width:400px;height:100vh;background:var(--neutral-100);z-index:201;display:flex;flex-direction:column;box-shadow:-4px 0 32px rgba(0,0,0,.18);transition:right .3s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.filter-sheet.open{right:0;}
+.sheet-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--gray-300);flex-shrink:0;}
+.sheet-title{font-size:17px;font-weight:700;color:var(--neutral-300);}
+.sheet-close{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--gray-300);background:var(--neutral-100);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s;}
+.sheet-close:hover{border-color:var(--purple-300);}
+.sheet-close svg{width:13px;height:13px;stroke:var(--gray-500);fill:none;stroke-width:2.5;stroke-linecap:round;}
+.sheet-body{flex:1;min-height:0;overflow-y:auto;overflow-x:visible;padding:0 24px;}
+
+/* Accordion sections */
+.fsec{border-bottom:1px solid var(--gray-300);}
+.fsec-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;user-select:none;}
+.fsec-title{font-size:14px;font-weight:600;color:var(--neutral-300);}
+.fsec-chev{color:var(--gray-500);transition:transform .2s;}
+.fsec-chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.fsec.closed .fsec-chev{transform:rotate(0deg);}
+.fsec:not(.closed) .fsec-chev{transform:rotate(180deg);}
+.fsec-body{padding-bottom:16px;}
+.fsec.closed .fsec-body{display:none;}
+
+/* Date presets */
+.presets{display:flex;flex-wrap:nowrap;gap:8px;padding:8px 0 0;overflow-x:auto;scrollbar-width:none;margin-bottom:0;}
+.presets::-webkit-scrollbar{display:none;}
+.preset{padding:4px 16px;border-radius:16px;font-size:12px;font-weight:500;background:var(--neutral-100);color:var(--purple-300);border:1px solid var(--gray-300);cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.preset:hover{border-color:var(--purple-300);}
+.preset.active{background:var(--purple-300);color:white;border-color:var(--purple-300);}
+
+/* Calendar — DS Datepicker */
+.cal-wrap{background:var(--gray-100);border-radius:12px;border:1px solid var(--gray-100);overflow:hidden;margin-top:12px;}
+.cal-nav{display:flex;align-items:center;padding:14px 20px 12px;background:var(--gray-100);border-bottom:1.5px solid var(--purple-300);}
+.cal-month-btn{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;color:var(--neutral-300);text-transform:uppercase;letter-spacing:.4px;cursor:pointer;border:none;background:transparent;font-family:var(--font);flex:1;}
+.cal-month-btn svg{width:14px;height:14px;stroke:var(--neutral-300);fill:none;stroke-width:2;stroke-linecap:round;}
+.cal-arrows{display:flex;gap:4px;}
+.cal-nav-btn{width:32px;height:32px;border-radius:8px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.cal-nav-btn:hover{background:rgba(0,0,0,.06);}
+.cal-nav-btn svg{width:16px;height:16px;stroke:var(--neutral-300);fill:none;stroke-width:2.5;stroke-linecap:round;}
+.cal-grid{padding:8px 16px 16px;background:var(--gray-100);}
+.cal-dnames{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:0;}
+.cal-dname{text-align:center;font-size:13px;font-weight:500;color:var(--neutral-300);padding:10px 0 6px;}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cday{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--purple-300);border-radius:99px;cursor:pointer;transition:all .12s;font-weight:400;}
+.cday:hover:not(.empty){background:rgba(41,14,67,.08);}
+.cday.empty{cursor:default;color:transparent;}
+.cday.today{font-weight:700;}
+.cday.sel{background:var(--purple-300);color:white;font-weight:600;}
+.cday.in-range{background:rgba(41,14,67,.08);color:var(--purple-300);border-radius:0;}
+.cday.rstart{background:var(--purple-300);color:white;font-weight:600;border-radius:99px 0 0 99px;}
+.cday.rend{background:var(--purple-300);color:white;font-weight:600;border-radius:0 99px 99px 0;}
+.cday.rstart.rend{border-radius:99px;}
+
+/* Checkboxes */
+.cb-list{display:flex;flex-direction:column;}
+.cb-row{display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;}
+.cb-row:hover .cb-box{border-color:var(--purple-300);}
+.cb-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--gray-300);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.cb-box.on{background:var(--purple-300);border-color:var(--purple-300);}
+.cb-box svg{width:11px;height:11px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.cb-lbl{font-size:13px;color:var(--neutral-300);}
+
+/* CNPJ dropdown */
+.cnpj-wrap{position:relative;}
+.cnpj-trig{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 16px;border:1.5px solid var(--gray-300);border-radius:99px;background:var(--neutral-100);cursor:pointer;transition:border-color .15s;font-family:var(--font);}
+.cnpj-trig:hover,.cnpj-trig.open{border-color:var(--purple-300);}
+.cnpj-lbl{font-size:13px;color:var(--gray-500);}
+.cnpj-lbl.sel{color:var(--neutral-300);font-weight:500;}
+.cnpj-chev{color:var(--gray-500);transition:transform .2s;display:flex;align-items:center;}
+.cnpj-chev svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.cnpj-trig.open .cnpj-chev{transform:rotate(180deg);}
+.cnpj-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--neutral-100);border:1px solid var(--gray-100);border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.10);z-index:50;}
+.cnpj-menu.open{display:block;}
+.cnpj-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--gray-100);}
+.cnpj-opt:last-of-type{border-bottom:none;}
+.cnpj-opt:hover{background:var(--gray-100);}
+.cnpj-cb{width:20px;height:20px;border-radius:4px;border:1.5px solid var(--gray-300);background:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cnpj-cb.on{background:var(--purple-300);border-color:var(--purple-300);}
+.cnpj-cb svg{width:11px;height:11px;stroke:white;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+.cnpj-opt-info{display:flex;flex-direction:column;gap:2px;}
+.cnpj-opt-info strong{font-size:13px;font-weight:600;color:var(--neutral-300);}
+.cnpj-opt-info span{font-size:12px;color:var(--gray-500);}
+.cnpj-add-row{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-top:1px solid var(--gray-100);font-size:13px;font-weight:500;color:var(--blue-100);cursor:pointer;transition:background .15s;}
+.cnpj-add-row:hover{background:var(--gray-100);}
+.cnpj-add-row svg{width:16px;height:16px;flex-shrink:0;}
+
+/* Filter Footer — Limpar (texto) + Aplicar (pill roxo) */
+.sheet-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--gray-100);flex-shrink:0;background:var(--neutral-100);}
+.btn-clear{padding:0;border:none;background:transparent;font-size:14px;font-weight:500;color:var(--neutral-300);cursor:pointer;font-family:var(--font);transition:color .15s;}
+.btn-clear:hover{color:var(--purple-300);}
+.btn-apply{padding:10px 28px;border-radius:99px;background:var(--purple-300);color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);transition:background .15s,opacity .15s;}
+.btn-apply:hover:not(:disabled){background:var(--purple-100);}
+.btn-apply:disabled{background:var(--gray-300);color:var(--gray-500);cursor:not-allowed;}
+
+/* ═══════════════════════════════════════════════════════════
+   CNPJ SHEET (720px ≈ 40% de 1440)
+   DS inputs: NewInput (h:48, r:24, border 1px solid #000)
+═══════════════════════════════════════════════════════════ */
+.add-cnpj-sheet{
+  position:fixed;top:0;right:-720px;width:720px;height:100vh;
+  background:var(--neutral-100);z-index:202;
+  display:flex;flex-direction:column;
+  box-shadow:-4px 0 32px rgba(0,0,0,.18);
+  transition:right .3s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.add-cnpj-sheet.open{right:0;}
+
+/* Header */
+.ac-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:32px 96px 20px;flex-shrink:0;}
+.ac-title{font-size:24px;font-weight:500;color:var(--neutral-300);letter-spacing:-.3px;margin-bottom:4px;}
+.ac-subtitle{font-size:12px;font-weight:400;color:#E53E3E;}
+.ac-close{width:32px;height:32px;border-radius:8px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;margin-top:4px;}
+.ac-close:hover{background:var(--gray-100);}
+.ac-close svg{width:16px;height:16px;stroke:var(--neutral-300);fill:none;stroke-width:2.5;stroke-linecap:round;}
+
+/* Scrollable body */
+.ac-body{flex:1;min-height:0;overflow-y:auto;padding:4px 96px 24px;display:flex;flex-direction:column;}
+
+/* DS NewInput — label 14px Bold, input h:48, r:24, border 1px #000 */
+.ac-field{display:flex;flex-direction:column;gap:4px;margin-bottom:20px;}
+.ac-label{font-size:14px;font-weight:700;color:var(--neutral-300);display:flex;align-items:center;flex-wrap:wrap;line-height:1.5;}
+.ac-label .req{color:#E53E3E;margin-right:1px;}
+.ac-label .hint{font-size:14px;font-weight:400;color:var(--neutral-300);}
+
+/* Default: border 1px solid black */
+.ac-input{
+  width:100%;height:48px;
+  border:1px solid #000;
+  border-radius:24px;
+  padding:0 16px;
+  font-family:var(--font);font-size:14px;font-weight:700;
+  color:var(--neutral-300);background:var(--neutral-100);
+  outline:none;transition:border-width .1s;box-sizing:border-box;
+}
+/* Placeholder: 14px Bold #A9A9A9 */
+.ac-input::placeholder{color:rgb(169,169,169);font-weight:700;}
+/* Active: border 2px solid #1C2024 */
+.ac-input:focus{border-width:2px;border-color:var(--neutral-300);}
+/* Error: border 1px solid rgb(163,13,17), text rgb(219,0,7) */
+.ac-input.err{border-color:rgb(163,13,17);color:rgb(219,0,7);}
+.ac-input.err::placeholder{color:rgb(219,0,7);}
+/* Disabled */
+.ac-input:disabled{background:var(--gray-100);color:var(--gray-500);cursor:not-allowed;border-color:var(--gray-300);}
+
+.ac-helper{font-size:12px;font-weight:500;color:rgb(97,97,97);}
+.ac-helper.err{color:rgb(229,28,0);}
+
+.ac-row2{display:flex;gap:16px;margin-bottom:20px;}
+.ac-row2 .ac-field{flex:1;margin-bottom:0;}
+
+/* Section header */
+.ac-sec-hdr{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:var(--gray-500);margin-bottom:16px;margin-top:4px;}
+.ac-sec-hdr svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+
+/* Sem número */
+.ac-sem-num{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--neutral-300);cursor:pointer;margin-top:6px;user-select:none;}
+.ac-sem-num input{width:14px;height:14px;border-radius:3px;accent-color:var(--purple-300);cursor:pointer;}
+
+/* ═══════════════════════════════════════════════════════════
+   DS DROPZONE — 4 estados
+   Default: bg #F2F4F7, r:16, border 1px dashed #1C2024
+   Error:   border dashed red, msg vermelho abaixo
+   Hover:   bg rgb(150,223,251), border dashed #00AEEF
+   Uploaded: bg white, border 1px solid #A9A9A9, card com arquivo
+═══════════════════════════════════════════════════════════ */
+.dz-label-title{font-size:14px;font-weight:700;color:var(--gray-500);margin-bottom:2px;}
+.dz-label-sub{font-size:12px;font-weight:400;color:var(--neutral-300);margin-bottom:8px;}
+
+/* Default / Hover / Error container */
+.dropzone{
+  width:100%;border-radius:16px;
+  background:var(--gray-100);
+  border:1px dashed var(--neutral-300);
+  padding:32px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  cursor:pointer;transition:background .2s,border-color .2s;box-sizing:border-box;
+}
+.dropzone:hover,.dropzone.dz-hover{background:rgb(150,223,251);border-color:var(--blue-100);}
+.dropzone:hover .dz-icon svg,.dropzone.dz-hover .dz-icon svg{stroke:var(--blue-100);}
+.dropzone.dz-error{background:var(--neutral-100);border-color:rgb(163,13,17);}
+.dz-icon svg{width:28px;height:28px;stroke:var(--gray-500);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;}
+.dz-title{font-size:14px;font-weight:700;color:var(--gray-500);text-align:center;}
+.dz-hint{font-size:12px;font-weight:700;color:var(--gray-500);}
+/* Error message below dropzone */
+.dz-error-msg{font-size:14px;font-weight:700;color:rgb(229,72,77);text-align:center;margin-top:8px;display:none;}
+.dz-error-msg.show{display:block;}
+
+/* Uploaded state */
+.dz-uploaded{
+  width:100%;border-radius:16px;
+  background:var(--neutral-100);border:1px solid var(--gray-600);
+  padding:16px 20px;
+  display:none;align-items:center;gap:12px;box-sizing:border-box;
+  flex-direction:column;
+}
+.dz-uploaded.show{display:flex;}
+.dz-uploaded-row{display:flex;align-items:center;gap:12px;width:100%;}
+.dz-file-icon{width:40px;height:40px;border-radius:10px;background:rgba(0,174,239,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dz-file-icon svg{width:20px;height:20px;stroke:var(--blue-100);fill:none;stroke-width:1.8;stroke-linecap:round;}
+.dz-file-info{flex:1;min-width:0;}
+.dz-file-name{font-size:14px;font-weight:500;color:var(--neutral-300);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dz-file-size{font-size:12px;font-weight:400;color:var(--neutral-300);margin-top:2px;}
+.dz-actions{display:flex;gap:8px;flex-shrink:0;}
+.dz-btn{width:36px;height:36px;border-radius:8px;border:none;background:var(--gray-100);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.dz-btn:hover{background:var(--gray-300);}
+.dz-btn svg{width:16px;height:16px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.dz-btn.dl svg{stroke:var(--blue-100);}
+.dz-btn.rm svg{stroke:#DB0007;}
+.dz-progress-bar{height:3px;width:100%;background:var(--gray-100);border-radius:2px;overflow:hidden;margin-top:4px;}
+.dz-progress-fill{height:100%;background:var(--purple-300);border-radius:2px;width:0%;transition:width .4s;}
+
+/* CNPJ Sheet Footer */
+.ac-footer{display:flex;flex-direction:column;gap:10px;padding:12px 96px 20px;border-top:1px solid var(--gray-100);flex-shrink:0;}
+.ac-btn-save{width:100%;height:44px;border-radius:99px;background:var(--gray-500);color:var(--neutral-100);border:none;font-size:14px;font-weight:500;cursor:not-allowed;font-family:var(--font);transition:background .15s,color .15s;}
+.ac-btn-save:not([disabled]){background:var(--purple-300);color:white;cursor:pointer;}
+.ac-btn-save:not([disabled]):hover{background:var(--purple-100);}
+.ac-btn-cancel{width:100%;height:44px;border-radius:99px;background:var(--neutral-100);color:var(--purple-300);border:1.5px solid var(--purple-300);font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;}
+.ac-btn-cancel:hover{background:rgba(41,14,67,.06);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══════ SIDEBAR ═══════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">Smash<span class="sb-logo-dot">.</span></div>
+    <div class="sb-toggle-wrap">
+      <button class="sb-toggle">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="18" rx="1"/><path d="M14 3h7v18h-7"/></svg>
+      </button>
+      <div class="sb-tooltip">Close sidebar</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-item active">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="sb-lbl">Meus pedidos</span>
+      <span class="sb-badge">1</span>
+      <span class="sb-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+    </div>
+    <div class="sb-item">
+      <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      <span class="sb-lbl">Campanhas</span>
+    </div>
+    <div class="sb-item">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span class="sb-lbl">Assinatura</span>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">W<div class="sdot"></div></div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">Joaquim Silva</div>
+        <div class="sb-user-email">joaquim.silva@email.com</div>
+      </div>
+      <div class="sb-user-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════ MAIN ══════════════════════════════════════════ -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-right">
+      <div class="tb-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+      <div class="tb-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+      <div class="tb-avatar">W<div class="sdot"></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="bc-row">
+      <span class="bc-lk">Home</span><span class="bc-sep"> / </span><span class="bc-cur">Meus pedidos</span>
+    </div>
+    <div class="filter-chips" id="fchips"></div>
+    <div class="controls-row">
+      <button class="tab-pill active" onclick="setTab(this)">Todos os pedidos</button>
+      <button class="tab-pill" onclick="setTab(this)">A enviar</button>
+      <button class="tab-pill" onclick="setTab(this)">Enviados</button>
+      <button class="filter-btn" onclick="openSheet()">
+        <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+        Filtrar
+      </button>
+    </div>
+    <div class="month-heading">Novembro</div>
+
+    <!-- Order Card -->
+    <div class="order-card" id="order1">
+      <div class="order-date-row">
+        <span class="order-date">12 de novembro de 2025</span>
+        <button class="collapse-btn" onclick="toggleOrder('order1')">
+          <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+      </div>
+      <div class="order-summary">
+        <div class="av-stack">
+          <div class="av av-mc"><svg width="20" height="20" viewBox="0 0 200 200"><path d="M40 140 L40 60 Q40 40 60 40 Q80 40 100 80 Q120 40 140 40 Q160 40 160 60 L160 140" fill="none" stroke="white" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="av av-ca">C&A</div>
+          <div class="av av-plus">+1</div>
+        </div>
+        <div class="order-info">
+          <div class="order-value">Valor total do pedido: R$2.500,00</div>
+          <div class="order-fee">Taxa de serviço: R$ 2,00</div>
+        </div>
+        <div class="order-id">#PO-JQWEadzPCzmiXc8fd2Js</div>
+        <span class="status-badge s-concluido">Concluído</span>
+      </div>
+      <div class="order-actions">
+        <div class="action-lk"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Receber Planilha de Resgate</div>
+        <div class="action-lk"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Nota Fiscal</div>
+        <div class="action-lk"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Nota de Débito</div>
+      </div>
+      <div class="order-items">
+        <div class="items-hdr"><div>Itens do pedido</div><div>Cards restantes</div><div>Data de validade</div><div>Ações</div></div>
+        <div class="item-row">
+          <div class="item-brand">
+            <div class="brand-logo"><svg width="24" height="24" viewBox="0 0 200 200"><path d="M40 140 L40 60 Q40 40 60 40 Q80 40 100 80 Q120 40 140 40 Q160 40 160 60 L160 140" fill="none" stroke="white" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="brand-info"><strong>Gift Card: {Partner}</strong><span>Quantidade: 2 unid</span><span>Valor do Gift Card: R$ 40,00</span></div>
+          </div>
+          <div class="item-qty">2 unidades</div>
+          <div class="item-date"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>12/07/2026</div>
+          <div class="item-acts">
+            <button class="btn-enviar">Enviar</button>
+            <div class="campaign-lk"><svg viewBox="0 0 24 24" fill="none" stroke="#0091FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Campanha</div>
+          </div>
+        </div>
+        <div class="item-row">
+          <div class="item-brand">
+            <div class="brand-logo"><svg width="24" height="24" viewBox="0 0 200 200"><path d="M40 140 L40 60 Q40 40 60 40 Q80 40 100 80 Q120 40 140 40 Q160 40 160 60 L160 140" fill="none" stroke="white" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="brand-info"><strong>Gift Card: {Partner}</strong><span>Quantidade: 2 unid</span><span>Valor do Gift Card: R$ 40,00</span></div>
+          </div>
+          <div class="item-qty">2 unidades</div>
+          <div class="item-date"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>12/07/2026</div>
+          <div class="item-acts">
+            <button class="btn-editar">Editar campanha</button>
+            <div class="campaign-lk"><svg viewBox="0 0 24 24" fill="none" stroke="#0091FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Campanha</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+
+<!-- ═══════ FILTER SHEET ══════════════════════════════════ -->
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="filter-sheet" id="sheet">
+  <div class="sheet-hdr">
+    <div class="sheet-title">Filtros</div>
+    <button class="sheet-close" onclick="closeSheet()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <!-- Período -->
+    <div class="fsec" id="secP">
+      <div class="fsec-hdr" onclick="toggleSec('secP')">
+        <span class="fsec-title">Período</span>
+        <span class="fsec-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="fsec-body">
+        <div class="presets">
+          <button class="preset" onclick="setPreset(this,'hoje')">Hoje</button>
+          <button class="preset" onclick="setPreset(this,'ontem')">Ontem</button>
+          <button class="preset" onclick="setPreset(this,'7d')">Últimos 7 dias</button>
+          <button class="preset" onclick="setPreset(this,'30d')">Últimos 30 dias</button>
+          <button class="preset" onclick="setPreset(this,'90d')">Últimos 90 dias</button>
+          <button class="preset" onclick="setPreset(this,'120d')">Últimos 120 dias</button>
+        </div>
+        <div class="cal-wrap">
+          <div class="cal-nav">
+            <button class="cal-month-btn" id="calMonthBtn">
+              <span id="calMonth"></span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="cal-arrows">
+              <button class="cal-nav-btn" onclick="calPrev()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <button class="cal-nav-btn" onclick="calNext()"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-dnames">
+              <div class="cal-dname">S</div><div class="cal-dname">T</div><div class="cal-dname">Q</div>
+              <div class="cal-dname">Q</div><div class="cal-dname">S</div><div class="cal-dname">S</div><div class="cal-dname">D</div>
+            </div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+        </div>
+        <div style="height:8px"></div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="fsec closed" id="secS">
+      <div class="fsec-hdr" onclick="toggleSec('secS')">
+        <span class="fsec-title">Status de pagamento</span>
+        <span class="fsec-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="fsec-body">
+        <div class="cb-list">
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Aguardando pagamento</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Concluído</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Pagamento estornado</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Pagamento reprovado</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Pedido cancelado</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Pedido em análise</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Prazo de pagamento expirado</span></label>
+          <label class="cb-row" onclick="toggleCb(this)"><div class="cb-box"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div><span class="cb-lbl">Processando o pedido</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- CNPJ -->
+    <div class="fsec closed" id="secC" style="border-bottom:none">
+      <div class="fsec-hdr" onclick="toggleSec('secC')">
+        <span class="fsec-title">CNPJ</span>
+        <span class="fsec-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+      </div>
+      <div class="fsec-body">
+        <div class="cnpj-wrap">
+          <div class="cnpj-trig" id="cnpjTrig" onclick="toggleDD()">
+            <span class="cnpj-lbl" id="cnpjLbl">Selecione um CNPJ</span>
+            <span class="cnpj-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </div>
+          <div class="cnpj-menu" id="cnpjMenu">
+            <div class="cnpj-opt" onclick="toggleCnpj(this,'smash')">
+              <div class="cnpj-cb" id="cb-smash"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div>
+              <div class="cnpj-opt-info"><strong>Smash Ltda.</strong><span>00.000.000/0000-00</span></div>
+            </div>
+            <div class="cnpj-opt" onclick="toggleCnpj(this,'rh')">
+              <div class="cnpj-cb" id="cb-rh"><svg viewBox="0 0 12 10"><polyline points="1.5 5 4.5 8 10.5 1"/></svg></div>
+              <div class="cnpj-opt-info"><strong>RH</strong><span>00.000.000/0000-00</span></div>
+            </div>
+            <div class="cnpj-add-row" onclick="openAddCnpj()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#00AEEF" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Adicionar CNPJ
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Footer — Limpar + Aplicar -->
+  <div class="sheet-footer">
+    <button class="btn-clear" onclick="clearAll()">Limpar</button>
+    <button class="btn-apply" id="btnApply" onclick="applyFilters()" disabled>Aplicar</button>
+  </div>
+</div>
+
+<!-- ═══════ CNPJ SHEET ════════════════════════════════════ -->
+<div class="sheet-overlay" id="overlayAC" onclick="closeAddCnpj()"></div>
+<div class="add-cnpj-sheet" id="sheetAC">
+  <div class="ac-hdr">
+    <div>
+      <div class="ac-title">Adicionar CNPJ</div>
+      <div class="ac-subtitle">*Campos obrigatórios</div>
+    </div>
+    <button class="ac-close" onclick="closeAddCnpj()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="ac-body">
+    <!-- Apelido -->
+    <div class="ac-field">
+      <label class="ac-label">Apelido do CNPJ<span class="hint"> - como ele vai aparecer na sua conta</span></label>
+      <input class="ac-input" id="f-apelido" type="text" placeholder="Ex: RH, Comercial, Filial..." maxlength="24" oninput="updCC(this,'cc-ap',24);checkSave()"/>
+      <span class="ac-helper" id="cc-ap">0/24 caracteres</span>
+    </div>
+    <!-- CNPJ -->
+    <div class="ac-field">
+      <label class="ac-label"><span class="req">*</span>CNPJ</label>
+      <input class="ac-input" id="f-cnpj" type="text" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCnpj(this);checkSave()"/>
+    </div>
+    <!-- Razão Social -->
+    <div class="ac-field">
+      <label class="ac-label"><span class="req">*</span>Razão Social</label>
+      <input class="ac-input" id="f-razao" type="text" placeholder="Nome conforme CNPJ na Receita Federal" oninput="checkSave()"/>
+    </div>
+    <!-- Endereço header -->
+    <div class="ac-sec-hdr">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Endereço
+    </div>
+    <!-- CEP -->
+    <div class="ac-field">
+      <label class="ac-label"><span class="req">*</span>CEP</label>
+      <input class="ac-input" id="f-cep" type="text" placeholder="00000-000" maxlength="9" oninput="maskCep(this);checkSave()"/>
+    </div>
+    <!-- Estado + Cidade -->
+    <div class="ac-row2">
+      <div class="ac-field">
+        <label class="ac-label"><span class="req">*</span>Estado</label>
+        <input class="ac-input" id="f-estado" type="text" placeholder="Estado" maxlength="2" oninput="checkSave()"/>
+      </div>
+      <div class="ac-field">
+        <label class="ac-label"><span class="req">*</span>Cidade</label>
+        <input class="ac-input" id="f-cidade" type="text" placeholder="Cidade" oninput="checkSave()"/>
+      </div>
+    </div>
+    <!-- Logradouro -->
+    <div class="ac-field">
+      <label class="ac-label"><span class="req">*</span>Logradouro</label>
+      <input class="ac-input" id="f-logradouro" type="text" placeholder="Logradouro" oninput="checkSave()"/>
+    </div>
+    <!-- Bairro + Número -->
+    <div class="ac-row2">
+      <div class="ac-field" style="flex:1.8">
+        <label class="ac-label"><span class="req">*</span>Bairro</label>
+        <input class="ac-input" id="f-bairro" type="text" placeholder="Bairro" oninput="checkSave()"/>
+      </div>
+      <div class="ac-field" style="flex:1">
+        <label class="ac-label"><span class="req">*</span>Número</label>
+        <input class="ac-input" id="f-numero" type="text" placeholder="123" oninput="checkSave()"/>
+        <label class="ac-sem-num">
+          <input type="checkbox" id="semNum" onchange="toggleSemNum(this)"/>
+          <span>Sem número</span>
+        </label>
+      </div>
+    </div>
+    <!-- Complemento -->
+    <div class="ac-field">
+      <label class="ac-label">Complemento</label>
+      <input class="ac-input" id="f-comp" type="text" placeholder="Complemento"/>
+    </div>
+
+    <!-- Contrato Social — DS Dropzone -->
+    <div class="ac-field" style="margin-top:4px">
+      <div class="dz-label-title">Contrato social <span style="font-weight:400">- opcional</span></div>
+      <div class="dz-label-sub">Documento</div>
+
+      <!-- Default/Hover/Error -->
+      <div class="dropzone" id="dz"
+        onclick="document.getElementById('dzInput').click()"
+        ondragover="event.preventDefault();this.classList.add('dz-hover')"
+        ondragleave="this.classList.remove('dz-hover')"
+        ondrop="event.preventDefault();this.classList.remove('dz-hover');dzDrop(event)">
+        <input type="file" id="dzInput" accept=".pdf,.jpg,.png" style="display:none" onchange="dzFile(this)"/>
+        <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="dz-title">Clique para enviar ou arraste o arquivo</div>
+        <div class="dz-hint">PDF, JPG ou PNG - Máx 10MB</div>
+      </div>
+      <div class="dz-error-msg" id="dzErr">Não foi possível enviar o documento. Tente novamente.</div>
+
+      <!-- Uploaded -->
+      <div class="dz-uploaded" id="dzUp">
+        <div class="dz-uploaded-row">
+          <div class="dz-file-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="dz-file-info">
+            <div class="dz-file-name" id="dzName">Nome do arquivo</div>
+            <div class="dz-file-size" id="dzSize">0KB</div>
+          </div>
+          <div class="dz-actions">
+            <button class="dz-btn dl" title="Download"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+            <button class="dz-btn rm" title="Remover" onclick="dzRemove()"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          </div>
+        </div>
+        <div class="dz-progress-bar"><div class="dz-progress-fill" id="dzProg"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ac-footer">
+    <button class="ac-btn-save" id="btnSave" disabled>Salvar CNPJ</button>
+    <button class="ac-btn-cancel" onclick="closeAddCnpj()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ─── Tabs ────────────────────────────────────────────────
+function setTab(el){document.querySelectorAll('.tab-pill').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+
+// ─── Order collapse ──────────────────────────────────────
+function toggleOrder(id){document.getElementById(id).classList.toggle('collapsed');}
+
+// ─── Filter sheet ────────────────────────────────────────
+function openSheet(){
+  const o=document.getElementById('overlay'),s=document.getElementById('sheet');
+  o.classList.add('open');s.classList.add('open');
+  renderCal();checkApply();
+  requestAnimationFrame(()=>o.classList.add('vis'));
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  const o=document.getElementById('overlay'),s=document.getElementById('sheet');
+  o.classList.remove('vis');s.classList.remove('open');
+  setTimeout(()=>{o.classList.remove('open');document.body.style.overflow='';},300);
+}
+
+// ─── Accordion ───────────────────────────────────────────
+function toggleSec(id){
+  const sec=document.getElementById(id);
+  sec.classList.toggle('closed');
+  if(!sec.classList.contains('closed')) setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+
+// ─── Checkboxes ──────────────────────────────────────────
+function toggleCb(row){row.querySelector('.cb-box').classList.toggle('on');checkApply();}
+
+// ─── Calendar ────────────────────────────────────────────
+let cY=new Date().getFullYear(),cM=new Date().getMonth(),cStart=null,cEnd=null,cHov=null;
+const MN=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+function fmtD(d){return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;}
+function renderCal(){
+  document.getElementById('calMonth').textContent=MN[cM]+' '+cY;
+  const g=document.getElementById('calDays');
+  const fd=new Date(cY,cM,1).getDay();
+  const off=fd===0?6:fd-1;
+  const dim=new Date(cY,cM+1,0).getDate();
+  const td=new Date();td.setHours(0,0,0,0);
+  let h='';
+  for(let i=0;i<off;i++)h+='<div class="cday empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const dt=new Date(cY,cM,d);
+    let c='cday';
+    if(dt.getTime()===td.getTime())c+=' today';
+    if(cStart&&cEnd){
+      if(dt.getTime()===cStart.getTime()&&dt.getTime()===cEnd.getTime())c+=' sel rstart rend';
+      else if(dt.getTime()===cStart.getTime())c+=' rstart';
+      else if(dt.getTime()===cEnd.getTime())c+=' rend';
+      else if(dt>cStart&&dt<cEnd)c+=' in-range';
+    } else if(cStart&&dt.getTime()===cStart.getTime())c+=' sel';
+    if(cStart&&!cEnd&&cHov&&dt>cStart&&dt<=cHov)c+=' in-range';
+    h+=`<div class="${c}" data-d="${cY}-${cM+1}-${d}" onclick="cClick(this)" onmouseenter="cHov2(this)">${d}</div>`;
+  }
+  g.innerHTML=h;
+}
+function cClick(el){
+  const[y,m,d]=el.getAttribute('data-d').split('-').map(Number);
+  const dt=new Date(y,m-1,d);
+  if(!cStart||(cStart&&cEnd)){cStart=dt;cEnd=null;cHov=null;}
+  else if(dt<cStart){cEnd=cStart;cStart=dt;}
+  else cEnd=dt;
+  document.querySelectorAll('.preset').forEach(c=>c.classList.remove('active'));
+  checkApply();renderCal();
+}
+function cHov2(el){
+  if(cStart&&!cEnd){const[y,m,d]=el.getAttribute('data-d').split('-').map(Number);cHov=new Date(y,m-1,d);renderCal();}
+}
+function calPrev(){cM--;if(cM<0){cM=11;cY--;}renderCal();}
+function calNext(){cM++;if(cM>11){cM=0;cY++;}renderCal();}
+function setPreset(el,p){
+  document.querySelectorAll('.preset').forEach(c=>c.classList.remove('active'));el.classList.add('active');
+  const t=new Date();t.setHours(0,0,0,0);
+  let s=new Date(t),e=new Date(t);
+  if(p==='ontem'){s.setDate(s.getDate()-1);e.setDate(e.getDate()-1);}
+  else if(p==='7d')s.setDate(s.getDate()-6);
+  else if(p==='30d')s.setDate(s.getDate()-29);
+  else if(p==='90d')s.setDate(s.getDate()-89);
+  else if(p==='120d')s.setDate(s.getDate()-119);
+  cStart=s;cEnd=e;cY=s.getFullYear();cM=s.getMonth();
+  checkApply();renderCal();
+}
+
+// ─── CNPJ multi-select ───────────────────────────────────
+const cnpjSel=new Set();
+function toggleDD(){
+  const t=document.getElementById('cnpjTrig'),m=document.getElementById('cnpjMenu');
+  const isOpen=m.classList.contains('open');
+  m.classList.toggle('open');t.classList.toggle('open',!isOpen);
+  if(!isOpen) setTimeout(()=>m.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function toggleCnpj(opt,id){
+  const cb=document.getElementById('cb-'+id);
+  if(cnpjSel.has(id)){cnpjSel.delete(id);cb.classList.remove('on');}
+  else{cnpjSel.add(id);cb.classList.add('on');}
+  updateCnpjTrig();checkApply();
+}
+function updateCnpjTrig(){
+  const lbl=document.getElementById('cnpjLbl');
+  const n=cnpjSel.size;
+  if(!n){lbl.textContent='Selecione um CNPJ';lbl.classList.remove('sel');}
+  else if(n===1){lbl.textContent=cnpjSel.has('smash')?'Smash Ltda.':'RH';lbl.classList.add('sel');}
+  else{lbl.textContent=n+' CNPJs adicionados';lbl.classList.add('sel');}
+}
+document.addEventListener('click',e=>{
+  const w=document.querySelector('.cnpj-wrap');
+  if(w&&!w.contains(e.target)){document.getElementById('cnpjMenu').classList.remove('open');document.getElementById('cnpjTrig').classList.remove('open');}
+});
+
+// ─── Apply/Clear filter ──────────────────────────────────
+function checkApply(){
+  const hasDate=!!cStart;
+  const hasStatus=document.querySelectorAll('#secS .cb-box.on').length>0;
+  const hasCnpj=cnpjSel.size>0;
+  document.getElementById('btnApply').disabled=!(hasDate||hasStatus||hasCnpj);
+}
+function applyFilters(){
+  const chips=[];
+  const fmt=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  if(cStart)chips.push(cEnd&&cEnd.getTime()!==cStart.getTime()?`${fmt(cStart)} – ${fmt(cEnd)}`:fmt(cStart));
+  document.querySelectorAll('#secS .cb-box.on').forEach(cb=>chips.push(cb.closest('.cb-row').querySelector('.cb-lbl').textContent));
+  cnpjSel.forEach(id=>chips.push(id==='smash'?'Smash Ltda.':'RH'));
+  document.getElementById('fchips').innerHTML=chips.map(l=>`<div class="fchip">${l}<span class="fchip-x" onclick="this.parentElement.remove()">×</span></div>`).join('');
+  closeSheet();
+}
+function clearAll(){
+  cStart=null;cEnd=null;cHov=null;cnpjSel.clear();
+  document.querySelectorAll('.preset').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.cb-box').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.cnpj-cb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('cnpjLbl').textContent='Selecione um CNPJ';
+  document.getElementById('cnpjLbl').classList.remove('sel');
+  document.getElementById('fchips').innerHTML='';
+  renderCal();checkApply();closeSheet();
+}
+
+// ─── Add CNPJ sheet ──────────────────────────────────────
+function openAddCnpj(){
+  document.getElementById('cnpjMenu').classList.remove('open');
+  document.getElementById('cnpjTrig').classList.remove('open');
+  const o=document.getElementById('overlayAC'),s=document.getElementById('sheetAC');
+  o.classList.add('open');s.classList.add('open');
+  requestAnimationFrame(()=>o.classList.add('vis'));
+  document.body.style.overflow='hidden';
+  checkSave();
+}
+function closeAddCnpj(){
+  const o=document.getElementById('overlayAC'),s=document.getElementById('sheetAC');
+  o.classList.remove('vis');s.classList.remove('open');
+  setTimeout(()=>{o.classList.remove('open');document.body.style.overflow='';},300);
+}
+
+// Campos obrigatórios
+const REQ=['f-cnpj','f-razao','f-cep','f-estado','f-cidade','f-logradouro','f-bairro','f-numero'];
+function checkSave(){
+  const semNum=document.getElementById('semNum')?.checked;
+  const ok=REQ.every(id=>{if(id==='f-numero'&&semNum)return true;const el=document.getElementById(id);return el&&el.value.trim().length>0;});
+  document.getElementById('btnSave').disabled=!ok;
+}
+function updCC(input,id,max){const el=document.getElementById(id);if(el)el.textContent=`${input.value.length}/${max} caracteres`;}
+function maskCnpj(inp){let v=inp.value.replace(/\D/g,'').slice(0,14);v=v.replace(/^(\d{2})(\d)/,'$1.$2');v=v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');v=v.replace(/\.(\d{3})(\d)/,'.$1/$2');v=v.replace(/(\d{4})(\d)/,'$1-$2');inp.value=v;}
+function maskCep(inp){let v=inp.value.replace(/\D/g,'').slice(0,8);v=v.replace(/^(\d{5})(\d)/,'$1-$2');inp.value=v;}
+function toggleSemNum(cb){const el=document.getElementById('f-numero');el.disabled=cb.checked;if(cb.checked)el.value='';checkSave();}
+
+// ─── Dropzone ────────────────────────────────────────────
+function dzFile(inp){const f=inp.files[0];if(f)dzShow(f);}
+function dzDrop(e){const f=e.dataTransfer.files[0];if(f)dzShow(f);}
+function dzShow(file){
+  const valid=['application/pdf','image/jpeg','image/png'].includes(file.type);
+  const dz=document.getElementById('dz'),err=document.getElementById('dzErr');
+  if(!valid||file.size>10*1024*1024){dz.classList.add('dz-error');err.classList.add('show');return;}
+  dz.classList.remove('dz-error');err.classList.remove('show');
+  dz.style.display='none';
+  const up=document.getElementById('dzUp');up.classList.add('show');
+  document.getElementById('dzName').textContent=file.name;
+  const kb=file.size<1024?file.size+'B':file.size<1024*1024?Math.round(file.size/1024)+'KB':(file.size/1024/1024).toFixed(1)+'MB';
+  document.getElementById('dzSize').textContent=kb;
+  const prog=document.getElementById('dzProg');prog.style.width='0%';
+  setTimeout(()=>prog.style.width='100%',50);
+}
+function dzRemove(){
+  document.getElementById('dz').style.display='';
+  document.getElementById('dz').classList.remove('dz-error');
+  document.getElementById('dzErr').classList.remove('show');
+  document.getElementById('dzUp').classList.remove('show');
+  document.getElementById('dzInput').value='';
+  document.getElementById('dzProg').style.width='0%';
+}
+</script>
+</body>
+</html>
