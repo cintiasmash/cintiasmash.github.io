@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestao CNPJ | Project Pages</title>
+  <style>
+    :root {
+      --panel: rgba(9, 18, 35, 0.84);
+      --panel-soft: rgba(15, 23, 42, 0.7);
+      --panel-border: rgba(148, 163, 184, 0.18);
+      --text: #e5eefb;
+      --muted: #9fb0c8;
+      --primary: #38bdf8;
+      --primary-strong: #0ea5e9;
+      --shadow: 0 24px 70px rgba(2, 8, 23, 0.45);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.15), transparent 28%),
+        radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 26%),
+        linear-gradient(180deg, #020617 0%, #08111f 48%, #0f172a 100%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .top-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .top-link:hover {
+      color: var(--primary);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.95fr);
+      gap: 24px;
+      padding: 34px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(9, 18, 35, 0.94), rgba(17, 28, 51, 0.82));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4vw, 4.3rem);
+      line-height: 1.03;
+    }
+
+    .hero p {
+      margin: 16px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      color: #082f49;
+      background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    }
+
+    .button-secondary {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+    }
+
+    .hero-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 24px;
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      background: var(--panel-soft);
+    }
+
+    .hero-panel h2,
+    .section-header h2,
+    .note-card h3,
+    .project-card h3 {
+      margin: 0;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card,
+    .project-card,
+    .note-card {
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .stat-card {
+      padding: 16px;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stat-label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .section {
+      margin-top: 28px;
+      padding: 28px;
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-header p,
+    .project-card p,
+    .note-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .section-count {
+      color: var(--muted);
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .project-grid,
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 24px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.42);
+    }
+
+    .project-tag {
+      width: fit-content;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: rgba(139, 92, 246, 0.16);
+      color: #d8b4fe;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .meta-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      color: #dbe7f7;
+      background: rgba(148, 163, 184, 0.09);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .status-ready {
+      color: #062b20;
+      background: rgba(52, 211, 153, 0.95);
+      border-color: rgba(52, 211, 153, 0.95);
+      font-weight: 700;
+    }
+
+    .note-card {
+      padding: 18px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 20px, 1120px);
+        padding-top: 20px;
+      }
+
+      .hero,
+      .section,
+      .project-card {
+        padding: 20px;
+      }
+
+      .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a class="top-link" href="../index.html">Back to repository home</a>
+
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Project folder</span>
+        <h1>Gestao CNPJ</h1>
+        <p>
+          This page works as the landing area for the HTML files inside the
+          <strong>gestao-cnpj</strong> project. Use it as the main GitHub Pages
+          entry for this folder and open each prototype screen from here.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="meus-pedidos.html">Open Meus Pedidos</a>
+          <a class="button button-secondary" href="../index.html">View all projects</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="Project summary">
+        <h2>Quick overview</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <span class="stat-value">1</span>
+            <span class="stat-label">Published page</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">HTML</span>
+            <span class="stat-label">Static prototype</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">UI</span>
+            <span class="stat-label">Dashboard layout</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">Ready</span>
+            <span class="stat-label">GitHub Pages friendly</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" aria-labelledby="pages-title">
+      <div class="section-header">
+        <div>
+          <h2 id="pages-title">Available pages</h2>
+          <p>
+            Start from this list when you want to browse the screens available in
+            this folder.
+          </p>
+        </div>
+        <span class="section-count">1 page</span>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card">
+          <span class="project-tag">Main prototype</span>
+          <div>
+            <h3>Meus Pedidos</h3>
+            <p>
+              Orders dashboard interface with sidebar navigation, top actions,
+              filters, and card-based content for a business management flow.
+            </p>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-pill">File: meus-pedidos.html</span>
+            <span class="meta-pill">Category: dashboard</span>
+            <span class="meta-pill status-ready">Status: ready</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="meus-pedidos.html">Open page</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="about-title">
+      <div class="section-header">
+        <div>
+          <h2 id="about-title">About this folder</h2>
+          <p>
+            This project page helps organize your repository so visitors can land
+            on a clean overview before opening the actual HTML screens.
+          </p>
+        </div>
+      </div>
+
+      <div class="notes">
+        <article class="note-card">
+          <h3>Simple navigation</h3>
+          <p>
+            Visitors can go back to the repository home or open the main project
+            screen directly from this page.
+          </p>
+        </article>
+
+        <article class="note-card">
+          <h3>Ready to expand</h3>
+          <p>
+            When you add more HTML files to this folder, you can duplicate the
+            project card and list the new pages here.
+          </p>
+        </article>
+
+        <article class="note-card">
+          <h3>Good for GitHub Pages</h3>
+          <p>
+            Everything is plain HTML and CSS, so it works well as a static
+            showcase site without extra tooling.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer">
+      Built as the project index page for the gestao-cnpj folder.
+    </p>
+  </main>
+</body>
+</html>
